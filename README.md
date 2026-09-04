@@ -159,12 +159,12 @@ app.root.on(Harness::SessionEvent)  { |e| log e }
 
 ## Built-in tools
 
-| Tool | Default policy | Notes |
-|---|---|---|
-| `read_file` | allow | Workspace-confined |
-| `list_directory` | allow | Workspace-confined |
-| `write_file` | ask | Workspace-confined |
-| `run_command` | ask | Runs in the workspace root |
+| Tool             | Default policy | Notes                      |
+|------------------|----------------|----------------------------|
+| `read_file`      | allow          | Workspace-confined         |
+| `list_directory` | allow          | Workspace-confined         |
+| `write_file`     | ask            | Workspace-confined         |
+| `run_command`    | ask            | Runs in the workspace root |
 
 Workspace confinement is the lightweight sandbox boundary: paths resolve
 against the workspace root and escapes are rejected. The approval policy is
@@ -174,20 +174,20 @@ absent).
 
 ## Concept map
 
-| DeepSeek Harness (TypeScript) | This shard (Crystal) |
-|---|---|
-| Cordis context / plugin tree | `Cordis::Context`, `Cordis.register` |
-| Reversible effects | `Cordis::Disposable`, `ctx.effect`, `ctx.own` |
-| Services (`ctx.sessions`, `ctx.tools`, ...) | `ctx["sessions"] = ...`, `ctx.service("tools", Tools)` |
-| `session/event`, `agent/*` events | `Harness::SessionEvent`, `Harness::AgentStart/Message/ToolCall/Finish` |
-| Bundles (`dsh-base`) | `Harness::Bundles::BASE` (`src/harness/bundles/base.yml`) |
-| Profiles (`web`, `headless`, ...) | `headless` template + profile YAML files |
-| `cordis.patch.yml` | Patch YAML via `--patch` / `App.boot(patches:)` |
-| `dsh --dump-config` | `dsh --dump-config` |
-| `llm` adapter seam | `Harness::LLM` (`OpenAIAdapter`, `MockAdapter`) |
-| Scoped tool registry + guarded pipeline | `Harness::Tools#register(scope:)` / `#execute` |
-| Sandbox & approval policy | Workspace confinement + `Harness::Approval` |
-| Dynamic plugin loading | Compile-time registration (Crystal is static) |
+| DeepSeek Harness (TypeScript)               | This shard (Crystal)                                                   |
+|---------------------------------------------|------------------------------------------------------------------------|
+| Cordis context / plugin tree                | `Cordis::Context`, `Cordis.register`                                   |
+| Reversible effects                          | `Cordis::Disposable`, `ctx.effect`, `ctx.own`                          |
+| Services (`ctx.sessions`, `ctx.tools`, ...) | `ctx["sessions"] = ...`, `ctx.service("tools", Tools)`                 |
+| `session/event`, `agent/*` events           | `Harness::SessionEvent`, `Harness::AgentStart/Message/ToolCall/Finish` |
+| Bundles (`dsh-base`)                        | `Harness::Bundles::BASE` (`src/harness/bundles/base.yml`)              |
+| Profiles (`web`, `headless`, ...)           | `headless` template + profile YAML files                               |
+| `cordis.patch.yml`                          | Patch YAML via `--patch` / `App.boot(patches:)`                        |
+| `dsh --dump-config`                         | `dsh --dump-config`                                                    |
+| `llm` adapter seam                          | `Harness::LLM` (`OpenAIAdapter`, `MockAdapter`)                        |
+| Scoped tool registry + guarded pipeline     | `Harness::Tools#register(scope:)` / `#execute`                         |
+| Sandbox & approval policy                   | Workspace confinement + `Harness::Approval`                            |
+| Dynamic plugin loading                      | Compile-time registration (Crystal is static)                          |
 
 Deliberately out of scope (upstream has them; this shard is the core
 library): the web UI, the TypeScript/Python SDK servers, ACP, telemetry and
