@@ -1,0 +1,40 @@
+# src/harness/bundles/base.yml
+# The shared first layer of every shipped profile: session log, system
+# prompt, approval policy, tool registry, built-in tools, model adapter,
+# agent registry, and the default agent loop. Every row is replaceable by a
+# patch from a higher layer.
+rows:
+  - id: core/session
+    plugin: core/session
+    config: {}
+  - id: core/system-prompt
+    plugin: core/system-prompt
+    config: {}
+  - id: core/approval
+    plugin: core/approval
+    config:
+      rules:
+        - {tool: "run_command", decision: "ask"}
+        - {tool: "write_file", decision: "ask"}
+        - {tool: "*", decision: "allow"}
+  - id: core/tools
+    plugin: core/tools
+    config: {}
+  - id: tools/fs
+    plugin: tools/fs
+    config: {}
+  - id: tools/shell
+    plugin: tools/shell
+    config: {}
+  - id: llm/llm
+    plugin: llm/llm
+    config:
+      provider: deepseek
+      model: deepseek-chat
+  - id: core/agent
+    plugin: core/agent
+    config: {}
+  - id: core/agent-loop
+    plugin: core/agent-loop
+    config:
+      max_turns: 25

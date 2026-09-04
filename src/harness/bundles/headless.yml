@@ -1,0 +1,9 @@
+# src/harness/bundles/headless.yml
+# The shipped headless profile: the base layer and nothing else. One-shot
+# runners apply all layers once at startup — replacing a one-shot
+# application's dependencies after it owns work would invalidate that
+# lifecycle, so patches compose at boot, not live.
+dsh:
+  profile:
+    bundles:
+      - base
