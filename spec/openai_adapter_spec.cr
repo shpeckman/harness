@@ -5,7 +5,7 @@ require "http/server"
 private COMPLETION = %({"id":"c1","object":"chat.completion","created":1,"model":"m","choices":[{"index":0,"message":{"role":"assistant","content":"hello","reasoning_content":"thinking..."},"finish_reason":"stop"}],"usage":{"prompt_tokens":3,"completion_tokens":2}})
 
 private def stub_server(&block : HTTP::Server::Context -> Nil) : {HTTP::Server, Socket::IPAddress}
-  server  = HTTP::Server.new { |context| block.call(context) }
+  server = HTTP::Server.new { |context| block.call(context) }
   address = server.bind_tcp("127.0.0.1", 0)
   spawn server.listen
   {server, address}
@@ -13,7 +13,7 @@ end
 
 describe Harness::OpenAIAdapter do
   it "preserves the base URL path and round-trips reasoning_content" do
-    paths  = [] of String
+    paths = [] of String
     bodies = [] of String
     http, address = stub_server do |context|
       paths << context.request.path
@@ -118,8 +118,8 @@ describe Harness::OpenAIAdapter do
   it "mounts a kimi provider from configuration" do
     ENV["MOONSHOT_API_KEY"] = "test-key"
     patch = %({"rows":[{"id":"llm/llm","config":{"provider":"kimi","prompt_cache_key":"s1"}}]})
-    app   = Harness::App.boot("headless", patches: [patch])
-    llm   = app.llm.as(Harness::OpenAIAdapter)
+    app = Harness::App.boot("headless", patches: [patch])
+    llm = app.llm.as(Harness::OpenAIAdapter)
     llm.base_url.should eq "https://api.moonshot.ai/v1"
     llm.model.should eq "kimi-k3"
     app.dispose

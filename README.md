@@ -114,8 +114,20 @@ app.dispose
 ## Replace the model from configuration
 
 The agent loop only knows the `Harness::LLM` seam. The shipped providers are
-`deepseek` (default), `openai-compatible`, and `mock` — a scripted adapter
-for offline runs and tests:
+`deepseek` (default), `kimi`, `openai-compatible`, and `mock` — a scripted
+adapter for offline runs and tests. Named providers read their key from the
+environment (`DEEPSEEK_API_KEY`, `MOONSHOT_API_KEY`/`KIMI_API_KEY`,
+`OPENAI_API_KEY`) unless `api_key` is set in config:
+
+```yaml
+rows:
+  - id: llm/llm
+    config:
+      provider: kimi           # base URL defaults to https://api.moonshot.ai/v1
+      model: kimi-k3           # the default; kimi-k2.7-code, kimi-k2.6, ... also work
+      reasoning_effort: low    # optional reasoning control
+      prompt_cache_key: sess-1 # optional Kimi prompt-cache bucket
+```
 
 ```yaml
 rows:
@@ -126,6 +138,17 @@ rows:
         - tool_call: {id: "c1", name: "run_command", arguments: "{\"command\":\"ls\"}"}
         - text: "Done."
 ```
+
+All non-mock providers go through the same `OpenAIAdapter`. It preserves any
+path component in `base_url` (e.g. `/v1`), retries with exponential backoff
+on 429/5xx responses, network errors, and `insufficient_system_resource`
+finishes (`max_retries`, default 3), and round-trips `reasoning_content` on
+assistant history — DeepSeek rejects tool-calling history that drops it, and
+Kimi's preserved-thinking models expect it verbatim. Cumulative token usage
+is exposed as `total_prompt_tokens` / `total_completion_tokens`, and the last
+response's `finish_reason` is available for truncation detection. Optional
+config knobs: `temperature`, `reasoning_effort`, `thinking`, `prompt_cache_key`,
+`user_id`, `max_retries`.
 
 ## Replace the agent loop from configuration
 
@@ -196,7 +219,7 @@ webhooks.
 ## Develop
 
 ```console
-$ crystal spec          # 50 examples
+$ crystal spec          # 56 examples
 $ crystal tool format
 $ shards build dsh
 ```
