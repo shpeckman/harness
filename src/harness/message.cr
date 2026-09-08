@@ -24,10 +24,12 @@ module Harness
     getter content      : String?
     getter tool_calls   : Array(ToolCall)?
     getter tool_call_id : String?
+    getter reasoning    : String?
 
     def initialize(@role : String, @content : String? = nil,
                    @tool_calls   : Array(ToolCall)? = nil,
-                   @tool_call_id : String? = nil)
+                   @tool_call_id : String? = nil,
+                   @reasoning    : String? = nil)
     end
 
     def self.system(content : String) : Message
@@ -38,8 +40,8 @@ module Harness
       new("user", content)
     end
 
-    def self.assistant(content : String? = nil, tool_calls : Array(ToolCall)? = nil) : Message
-      new("assistant", content, tool_calls)
+    def self.assistant(content : String? = nil, tool_calls : Array(ToolCall)? = nil, reasoning : String? = nil) : Message
+      new("assistant", content, tool_calls, reasoning: reasoning)
     end
 
     def self.tool(call_id : String, content : String) : Message
