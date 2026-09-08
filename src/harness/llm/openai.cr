@@ -15,7 +15,7 @@ module Harness
     getter base_url : String
 
     def initialize(@api_key : String, @model : String,
-                   @base_url : String = "https://api.deepseek.com",
+                   @base_url    : String   = "https://api.deepseek.com",
                    @temperature : Float64? = nil)
     end
 

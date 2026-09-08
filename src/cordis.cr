@@ -18,7 +18,7 @@ require "./cordis/context"
 # Because Crystal is statically compiled, plugins are registered by name at
 # compile time (third-party shards call `Cordis.register`) and selected at
 # boot time by configuration rows — the same extension model as a dynamically
-# loaded tree, minus runtime code loading.
+# loaded tree, minus runtime codec loading.
 module Cordis
   # A plugin factory. Receives the mounting context (a child of the mounter)
   # and the plugin's config row. Everything the factory registers on the

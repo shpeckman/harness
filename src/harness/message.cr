@@ -26,7 +26,7 @@ module Harness
     getter tool_call_id : String?
 
     def initialize(@role : String, @content : String? = nil,
-                   @tool_calls : Array(ToolCall)? = nil,
+                   @tool_calls   : Array(ToolCall)? = nil,
                    @tool_call_id : String? = nil)
     end
 
