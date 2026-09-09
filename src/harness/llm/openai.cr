@@ -24,7 +24,7 @@ module Harness
     getter base_url : String
     getter total_prompt_tokens     = 0
     getter total_completion_tokens = 0
-    getter last_finish_reason      : String? = nil
+    getter last_finish_reason : String? = nil
 
     RETRYABLE_STATUS = [429, 500, 502, 503, 504]
 
@@ -39,7 +39,7 @@ module Harness
     end
 
     def chat(messages : Array(Message), tools : Array(JSON::Any)? = nil) : LLMResponse
-      body = build_body(messages, tools, stream: false)
+      body     = build_body(messages, tools, stream: false)
       attempts = 0
       loop do
         response = parse_completion(JSON.parse(post(body)))
@@ -170,12 +170,12 @@ module Harness
         function = call["function"]
         ToolCall.new(call["id"].as_s, function["name"].as_s, function["arguments"].as_s)
       end)
-      usage = json["usage"]?
-      prompt_tokens = usage.try(&.["prompt_tokens"]?.try(&.as_i?))
+      usage             = json["usage"]?
+      prompt_tokens     = usage.try(&.["prompt_tokens"]?.try(&.as_i?))
       completion_tokens = usage.try(&.["completion_tokens"]?.try(&.as_i?))
       @total_prompt_tokens += prompt_tokens || 0
       @total_completion_tokens += completion_tokens || 0
-      finish = choice["finish_reason"]?.try(&.as_s?) || "stop"
+      finish              = choice["finish_reason"]?.try(&.as_s?) || "stop"
       @last_finish_reason = finish
       LLMResponse.new(
         Message.assistant(
@@ -239,7 +239,7 @@ module Harness
       attempts = 0
       loop do
         begin
-          uri = endpoint
+          uri    = endpoint
           client = new_client(uri)
           begin
             response = client.post(uri.request_target, headers: headers, body: body)
@@ -266,8 +266,8 @@ module Harness
       loop do
         yielded = false
         begin
-          uri = endpoint
-          client = new_client(uri)
+          uri            = endpoint
+          client         = new_client(uri)
           stream_headers = headers
           stream_headers["Accept"] = "text/event-stream"
           begin
@@ -311,20 +311,20 @@ end
 Cordis.register("llm/llm") do |ctx, config|
   provider = Harness::Cfg.str(config, "provider") || "deepseek"
 
-  key : String? = nil
-  model : String? = nil
+  key      : String? = nil
+  model    : String? = nil
   base_url : String? = nil
 
   case provider
   when "deepseek"
     key = Harness::Cfg.str(config, "api_key") || ENV["DEEPSEEK_API_KEY"]? ||
           raise "llm/llm: set config.api_key or the DEEPSEEK_API_KEY environment variable"
-    model = Harness::Cfg.str(config, "model") || "deepseek-chat"
+    model    = Harness::Cfg.str(config, "model") || "deepseek-chat"
     base_url = Harness::Cfg.str(config, "base_url") || "https://api.deepseek.com"
   when "kimi"
     key = Harness::Cfg.str(config, "api_key") || ENV["MOONSHOT_API_KEY"]? || ENV["KIMI_API_KEY"]? ||
           raise "llm/llm: set config.api_key or the MOONSHOT_API_KEY/KIMI_API_KEY environment variable"
-    model = Harness::Cfg.str(config, "model") || "kimi-k3"
+    model    = Harness::Cfg.str(config, "model") || "kimi-k3"
     base_url = Harness::Cfg.str(config, "base_url") || "https://api.moonshot.ai/v1"
   when "openai-compatible"
     key = Harness::Cfg.str(config, "api_key") || ENV["OPENAI_API_KEY"]? ||
@@ -335,19 +335,18 @@ Cordis.register("llm/llm") do |ctx, config|
             raise "llm/llm: config.model is required for provider \"openai-compatible\""
   end
 
-  llm : Harness::LLM =
-    if provider == "mock"
-      Harness::MockAdapter.from_config(config)
-    elsif key && model && base_url
-      Harness::OpenAIAdapter.new(key, model: model, base_url: base_url,
-        temperature: Harness::Cfg.get(config, "temperature").try(&.as_f?),
-        reasoning_effort: Harness::Cfg.str(config, "reasoning_effort"),
-        thinking: Harness::Cfg.get(config, "thinking").try(&.as_bool?),
-        prompt_cache_key: Harness::Cfg.str(config, "prompt_cache_key"),
-        user_id: Harness::Cfg.str(config, "user_id"),
-        max_retries: Harness::Cfg.int(config, "max_retries") || 3)
-    else
-      raise "llm/llm: unknown provider #{provider.inspect} (expected deepseek, kimi, openai-compatible, or mock)"
-    end
+  llm : Harness::LLM = if provider == "mock"
+    Harness::MockAdapter.from_config(config)
+  elsif key && model && base_url
+    Harness::OpenAIAdapter.new(key, model: model, base_url: base_url,
+      temperature: Harness::Cfg.get(config, "temperature").try(&.as_f?),
+      reasoning_effort: Harness::Cfg.str(config, "reasoning_effort"),
+      thinking: Harness::Cfg.get(config, "thinking").try(&.as_bool?),
+      prompt_cache_key: Harness::Cfg.str(config, "prompt_cache_key"),
+      user_id: Harness::Cfg.str(config, "user_id"),
+      max_retries: Harness::Cfg.int(config, "max_retries") || 3)
+  else
+    raise "llm/llm: unknown provider #{provider.inspect} (expected deepseek, kimi, openai-compatible, or mock)"
+  end
   ctx["llm"] = llm
 end
